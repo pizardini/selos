@@ -111,10 +111,24 @@ const DelButton = ({ data, rowMap }) => {
                         text: 'Sim', style: 'destructive',
                         onPress: async () => {
                             context.setBusy(true);
-                            // console.log(data.item.id);
-                            try { await db.runAsync('DELETE FROM selo WHERE id = $id', { $id: data.item.id }) }
+                            try { 
+                                await db.runAsync('DELETE FROM selo WHERE id = $id', { $id: data.item.id })
+                                Toast.show({
+                                    type: 'success',
+                                    text1: 'Sucesso',
+                                    text2: 'Selo excluído com sucesso!',
+                                    position: 'center',
+                                });
+                            }
+                                
                             catch(e) {
                                 console.log(e)
+                                Toast.show({
+                                    type: 'error',
+                                    text1: 'Erro',
+                                    text2: 'Não foi possível excluir o selo',
+                                    position: 'center',
+                                });
                             }
                             context.atualizarLista();
                             context.setBusy(false);

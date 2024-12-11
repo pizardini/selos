@@ -34,7 +34,7 @@ export default function AddScreen({navigation}) {
             quantidade: '',
             foto: ''
         },
-        // resolver: yupResolver(schema)
+        resolver: yupResolver(schema)
     });
 
     const updateTotal = async () => {
@@ -44,13 +44,29 @@ export default function AddScreen({navigation}) {
 
     const addSelo = async (data) => {
         const { nome, quantidade, foto: imagem } = data;
-        const resultado = await db.runAsync('insert into selo (nome, quantidade, foto) values ($nome, $quantidade, $foto)', { $nome: nome, $quantidade: quantidade, $foto: imagem });
-        console.log(resultado);
-        if (resultado.changes === 1) {
-            console.log('Selo salvo com sucesso');
-            navigation.navigate("list", { atualizar: true});
-            updateTotal();
+        try {
+            const resultado = await db.runAsync('insert into selo (nome, quantidade, foto) values ($nome, $quantidade, $foto)', { $nome: nome, $quantidade: quantidade, $foto: imagem });
+            console.log(resultado);
+            if (resultado.changes === 1) {
+                console.log('Selo salvo com sucesso');
+                navigation.navigate("list", { atualizar: true});
+                updateTotal();
+            }
+            Toast.show({
+                type: 'success',
+                text1: 'Sucesso',
+                text2: 'Selo cadastrado com sucesso!',
+                position: 'center',
+            });
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Erro',
+                text2: 'Não foi possível cadastrar o selo',
+                position: 'center',
+            });
         }
+
     }
 
     useEffect(() => {
@@ -106,7 +122,7 @@ export default function AddScreen({navigation}) {
             <View>
                 <Controller control={control}
                     render={({ field: { onChange, value } }) => (
-                        <TextInput placeholder="quantidade" keyboardType="phone-pad" onChangeText={onChange} value={value} style={estilosAdd.input} />
+                        <TextInput placeholder="Quantidade" keyboardType="phone-pad" onChangeText={onChange} value={value} style={estilosAdd.input} />
                     )}
                     name="quantidade" />
                 {errors.phone && <Text style={estilosAdd.error}>{errors.quantidade.message}</Text>}

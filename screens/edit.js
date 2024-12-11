@@ -21,15 +21,9 @@ export default function EditScreen ({navigation, route}) {
             quantidade: '',
             foto: '',
         },
-        // resolver: yupResolver(schema)
+        resolver: yupResolver(schema)
     });
 
-    // useEffect(()=>{
-    //     Carregar();
-    //     if (imagem) {
-    //         setValue('foto', imagem)
-    //     }
-    // },[route])
 
     useEffect(() => {
         Carregar();
@@ -53,7 +47,6 @@ export default function EditScreen ({navigation, route}) {
                         foto: resultado.foto
                     });
                     setImagem(resultado.foto);
-                    // console.log(resultado.foto.slice(-50));
                 } else {
                     throw new Error('Selo não encontrado');
                 }
@@ -104,7 +97,6 @@ export default function EditScreen ({navigation, route}) {
         try {
             const resultado = await db.runAsync('UPDATE selo SET nome = $nome, quantidade = $quantidade, foto = $foto WHERE id = $id', { $id: id, $nome: nome, $quantidade: quantidade, $foto: imagem });
             console.log(resultado);
-
             Toast.show({
                 type: 'success',
                 text1: 'Sucesso',
@@ -113,7 +105,7 @@ export default function EditScreen ({navigation, route}) {
             });
             navigation.navigate("list", { atualizar: true });
         } catch (error) {
-            console.log("erro toast "+error)
+            console.error(error);
             Toast.show({
                 type: 'error',
                 text1: 'Erro',
@@ -125,7 +117,6 @@ export default function EditScreen ({navigation, route}) {
 
     const onSubmit = async (data) => {
         setBusy(true);
-        console.log("Foto (Base64, últimos 50 caracteres):", data.foto.slice(-50));
         updateSelo(data);
         setBusy(false);
     };
