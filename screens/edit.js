@@ -15,7 +15,7 @@ export default function EditScreen ({navigation, route}) {
     const [busy, setBusy] = useState(false);
     const [imagem, setImagem] = useState(null);
 
-    const { control, handleSubmit, reset, formState: { errors } } = useForm({
+    const { control, handleSubmit, reset, formState: { errors }, setValue } = useForm({
         defaultValues: {
             nome: '',   
             quantidade: '',
@@ -24,9 +24,16 @@ export default function EditScreen ({navigation, route}) {
         // resolver: yupResolver(schema)
     });
 
-    useEffect(()=>{
+    // useEffect(()=>{
+    //     Carregar();
+    //     if (imagem) {
+    //         setValue('foto', imagem)
+    //     }
+    // },[route])
+
+    useEffect(() => {
         Carregar();
-    },[route])
+    }, [route]);
 
     const Carregar = async () => {
         reset({name: '', quantidade: '', foto: ''});
@@ -46,6 +53,7 @@ export default function EditScreen ({navigation, route}) {
                         foto: resultado.foto
                     });
                     setImagem(resultado.foto);
+                    // console.log(resultado.foto.slice(-50));
                 } else {
                     throw new Error('Selo não encontrado');
                 }
@@ -67,34 +75,34 @@ export default function EditScreen ({navigation, route}) {
     
     const chooseImage = async () => {
         let escolha = await ImagePicker.launchImageLibraryAsync({
-          allowsEditing: true,
-          allowsMultipleSelection: false,
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          quality: 1
+            allowsEditing: true,
+            allowsMultipleSelection: false,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
         });
-      
+    
         if (!escolha.canceled) {
             Keyboard.dismiss();
             const imagemUri = escolha.assets[0].uri;
             const base64Image = await fetch(imagemUri)
-              .then((response) => response.blob())
-              .then((blob) => new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-              }));
-        
+                .then((response) => response.blob())
+                .then((blob) => new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                }));
+    
             setImagem(base64Image);
-          }
-      }
+            setValue('foto', base64Image);
+        }
+    };
 
     const updateSelo = async(data) => {
         const { nome, quantidade, foto: imagem } = data;
         id = route.params?.id;
         try {
             const resultado = await db.runAsync('UPDATE selo SET nome = $nome, quantidade = $quantidade, foto = $foto WHERE id = $id', { $id: id, $nome: nome, $quantidade: quantidade, $foto: imagem });
-
             console.log(resultado);
 
             Toast.show({
@@ -105,7 +113,7 @@ export default function EditScreen ({navigation, route}) {
             });
             navigation.navigate("list", { atualizar: true });
         } catch (error) {
-            console.log(error)
+            console.log("erro toast "+error)
             Toast.show({
                 type: 'error',
                 text1: 'Erro',
@@ -115,12 +123,12 @@ export default function EditScreen ({navigation, route}) {
         }
     }
 
-    const onSubmit = async(data) => {
+    const onSubmit = async (data) => {
         setBusy(true);
+        console.log("Foto (Base64, últimos 50 caracteres):", data.foto.slice(-50));
         updateSelo(data);
-    
-        setBusy(p => false);
-    }
+        setBusy(false);
+    };
 
     return (
         <SafeAreaView style={globalStyles.container}>
@@ -153,7 +161,9 @@ export default function EditScreen ({navigation, route}) {
                     ) : (
                         <Text>Nenhuma imagem selecionada</Text>
                     )}
-                    <Button title="Apagar imagem" onPress={() => setImagem(null)} />
+                    <Button title="Apagar imagem" 
+                        onPress={() => { setImagem(null); setValue('foto', '') }} 
+                    />
                 </View>
             </View>
             <ActivityIndicator size="large" animating={busy} />
