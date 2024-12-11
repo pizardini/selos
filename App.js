@@ -7,7 +7,7 @@ import SeloScreen from './screens/add';
 import { View } from 'react-native';
 import { SQLiteProvider } from 'expo-sqlite';
 import AddScreen from './screens/add';
-// import EditScreen from './screens/edit';
+import EditScreen from './screens/edit';
 
 
 export default function App() {
@@ -16,7 +16,7 @@ export default function App() {
 
   const handleCriarBase = async (db) => {
     await db.execAsync('PRAGMA journal_mode = WAL;');
-    await db.execAsync('create table if not exists selo (id integer primary key not null, nome text not null, quantidade text not null, foto text not null)');
+    await db.execAsync('create table if not exists selo (id integer primary key not null, nome text not null, quantidade text not null, foto BLOB not null)');
     console.log(db)
   }
 
@@ -26,7 +26,7 @@ export default function App() {
       <Stack.Navigator>
         <Stack.Screen name='list' component={ListScreen} options={{title: 'Selos'}}/>
         <Stack.Screen name='add' component={AddScreen} options={{title: 'Novo'}}/>
-        {/* <Stack.Screen name='editr' component={EditScreen} options={{ title: 'Alteração' }} /> */}
+        <Stack.Screen name='edit' component={EditScreen} options={{ title: 'Alteração' }} />
       </Stack.Navigator>
       </SQLiteProvider>
       <StatusBar style="auto" />

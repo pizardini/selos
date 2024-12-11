@@ -37,7 +37,7 @@ export default function ListScreen({navigation, route}) {
         }
     }, [update, route]);
 
-    console.log(db);
+    // console.log(db);
 
     return (
         <SafeAreaView style={globalStyles.container}>
@@ -68,6 +68,7 @@ export default function ListScreen({navigation, route}) {
 }
 
 const ItemLista = (data, rowMap) => {
+    // console.log(data)
     return (
         <View style={{ flex: 1, justifyContent: 'center' }}>
             <Pressable style={({ pressed }) => [
@@ -79,7 +80,7 @@ const ItemLista = (data, rowMap) => {
                 onPress={() => { closeRow(rowMap, data.item.id) }}
             >
                 <View style={{ width: "100%" }}>
-                    <Text style={{ textAlign: "center", fontSize: 24 }}>{data.item.foto} {data.item.nome} {data.item.quantidade}</Text>
+                    <Text style={{ textAlign: "center", fontSize: 24 }}>{data.item.nome}</Text>
                 </View>
             </Pressable>
         </View>
@@ -109,14 +110,14 @@ const DelButton = ({ data, rowMap }) => {
                     {
                         text: 'Sim', style: 'destructive',
                         onPress: async () => {
-                            // context.setBusy(true);
-                            console.log(data.item.id);
+                            context.setBusy(true);
+                            // console.log(data.item.id);
                             try { await db.runAsync('DELETE FROM selo WHERE id = $id', { $id: data.item.id }) }
                             catch(e) {
                                 console.log(e)
                             }
-                            console.log()
-                            // context.setBusy(false);
+                            context.atualizarLista();
+                            context.setBusy(false);
                         },
                     },
                 ]
