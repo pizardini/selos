@@ -68,7 +68,7 @@ export default function EditScreen ({navigation, route}) {
     
     const chooseImage = async () => {
         let escolha = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
+            allowsEditing: false,
             allowsMultipleSelection: false,
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             quality: 1,
